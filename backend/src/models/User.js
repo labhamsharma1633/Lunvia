@@ -44,9 +44,6 @@ const userSchema = new mongoose.Schema({
     ]
 }, { timestamps: true });
 
-const User= mongoose.model("User", userSchema);
-//pre hook
-//TODO:EXPLAIN THIS ONCE AGAIN
 userSchema.pre("save",async function (next) {
     if(!this.isModified("password")) return next();
     try{
@@ -60,7 +57,18 @@ userSchema.pre("save",async function (next) {
 
     }
     
-})
+});
+userSchema.methods.matchPassword=async function(enteredPassword){
+    //123456
+    const isPasswordCorrect=await bcrypt.compare(enteredPassword,this.password);
+    return isPasswordCorrect;
+
+}
+
+const User= mongoose.model("User", userSchema);
+//pre hook
+//TODO:EXPLAIN THIS ONCE AGAIN
+
 
 
 
