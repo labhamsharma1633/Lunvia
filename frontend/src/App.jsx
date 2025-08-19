@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom"; 
+import { Routes, Route,Navigate } from "react-router-dom"; 
 import HomePage from "./pages/HomePage";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
@@ -12,12 +12,12 @@ import { useEffect,useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { axiosInstance } from "./lib/axios";
-import { axiosInstance } from "./lib/axios";
+
 
 const App = () => {
   //axios
   //react query tanstack query
-  const {data,isLoading,error}=useQuery({queryKey:["todos"],
+  const {data:authData,isLoading,error}=useQuery({queryKey:["authUser"],
     queryFn:async()=>{
       const res=await axiosInstance.get("/auth/me")
       
@@ -26,26 +26,23 @@ const App = () => {
     retry:false,
 
   });
-  console.log(data);
+  const authUser=authData?.user
   
   
   
 
   return (
     <div className="h-screen" data-theme="night">
-      
       <Routes>
-        <Route path="/" element={<HomePage/>}/>
-        <Route path="/signup" element={<SignUpPage/>}/>
-        <Route path="/login" element={<LoginPage/>}/>
-        <Route path="/chat" element={<ChatPage/>}/>
-        <Route path="/call" element={<CallPage/>}/>
-        <Route path="/onboarding" element={<Onboarding/>}/>
-        <Route path="/notification" element={<NotificationPage/>}/>
-
-
-
+        <Route path="/"element={authUser ? <HomePage /> : <Navigate to="/login" />}/>
+        <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/" />}/>
+        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />}/>
+        <Route path="/chat" element={authUser ? <ChatPage /> : <Navigate to="/login" />}/>
+        <Route path="/call" element={authUser ? <CallPage /> : <Navigate to="/login" />}/>
+        <Route path="/onboarding" element={authUser ? <Onboarding /> : <Navigate to="/login" />}/>
+        <Route path="/notification" element={authUser ? <NotificationPage /> : <Navigate to="/login" />}/>
       </Routes>
+
       <Toaster/>
       
     </div>
